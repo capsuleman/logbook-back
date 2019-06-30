@@ -18,7 +18,7 @@ The back is a Node application (Express) and the database connection is made wit
  ## Milestones
  `[X]` Specifications and README  
  `[X]` Definition of database scheme  
- `[ ]` Authentification of users  
+ `[X]` Authentification of users  
  `[ ]` Messages management  
  `[ ]` Encrpytion of messages  
 
