@@ -4,7 +4,7 @@
 Back-end of the LogBook application.
 The goal of LogBook application is to store daily reports with a web application.
   
-The back is a Node application and the database connection is made with sqlite3 module.
+The back is a Node application (Express) and the database connection is made with sqlite3 module.
 
 ## Endpoints
 `POST /newmessage` : adds a new message to a selected date to the connected user  
