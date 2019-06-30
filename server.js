@@ -31,9 +31,11 @@ app.use(cors());
 // Routes
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
+var messageRouter = require('./routes/message');
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/message', messageRouter);
 
 
 // Database access with DAO
@@ -47,9 +49,9 @@ dao.run(`CREATE TABLE IF NOT EXISTS user (
 
 dao.run(`CREATE TABLE IF NOT EXISTS message (
         userid INT,
+        target DATE,
         message TEXT,
-        post DATETIME,
-        target DATETIME
+        post DATETIME
     )`);
 
 
