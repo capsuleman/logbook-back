@@ -5,8 +5,9 @@ var rfs = require('rotating-file-stream')
 var AppDAO = require('./dao');
 var config = require('./config');
 
-
 var app = express();
+
+
 
 // Morgan logs
 if (config.log.output) {
@@ -23,9 +24,17 @@ if (config.log.output) {
     app.use(morgan(config.log.type))
 }
 
+// CORS
 app.use(cors());
 
 
+// Routes
+var indexRouter = require('./routes/index');
+
+app.use('/', indexRouter);
+
+
+// Database access with DAO
 var dao = new AppDAO('./db/main.db')
 
 dao.run(`CREATE TABLE IF NOT EXISTS user (
@@ -43,9 +52,5 @@ dao.run(`CREATE TABLE IF NOT EXISTS message (
         target DATETIME
     )`);
 
-
-app.get('/', function (req, res) {
-    return res.send('Hello world');
-});
 
 app.listen(config.web.port || 8080);
