@@ -72,4 +72,22 @@ router.post('/login', function (req, res) {
 });
 
 
+// MODIFY KEY ROUTE
+// modify the key from the JWT user
+router.post('/key', VerifyToken, function (req, res) {
+    dao.run('UPDATE user SET key = ? WHERE rowid = ?', [req.body.key, req.userId])
+        .then(() => { return res.status(200).send('Key added / changed') })
+        .catch(_ => { return res.status(500).send('Error on the server.') })
+})
+
+
+// REMOVE KEY ROUTE
+// delete the key from the JWT user
+router.delete('/key', VerifyToken, function (req, res) {
+    dao.run('UPDATE user SET key = ? WHERE rowid = ?', [null, req.userId])
+        .then(() => { return res.status(200).send('Key removed') })
+        .catch(_ => { return res.status(500).send('Error on the server.') })
+})
+
+
 module.exports = router;
