@@ -56,14 +56,14 @@ router.get('/me', VerifyToken, function (req, res) {
 // username and password are required.
 // Returns a JWT.
 router.post('/login', function (req, res) {
-    dao.get('SELECT * FROM user WHERE username = ?', [req.body.username])
+    dao.get('SELECT rowid, * FROM user WHERE username = ?', [req.body.username])
         .then(user => {
             if (!user) return res.status(401).send({ auth: false, token: null });
 
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
 
-            var token = jwt.sign({ id: user._id }, config.cred.authsecret, {
+            var token = jwt.sign({ id: user.rowid }, config.cred.authsecret, {
                 expiresIn: 86400 // expires in 24 hours
             });
             res.status(200).send({ auth: true, token: token });
