@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/capsuleman/logbook-back#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "^1.9.1",
     "rotating-file-stream": "^1.4.2",
     "sqlite3": "^4.0.9"
