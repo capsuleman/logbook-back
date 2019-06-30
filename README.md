@@ -10,9 +10,9 @@ The back is a Node application (Express) and the database connection is made wit
 `POST /newmessage` : adds a new message to a selected date to the connected user  
 `GET /message` : gets message at a specified date from the current user  
 `GET /date` : gets the dates with stored messages  
-`POST /login` : returns a JWT if the pair login/password is correct  
-`POST /register` : adds a new user with login and password  
-`GET /me` : gets informations about the current user
+`POST /auth/login` : returns a JWT if the pair username/password is correct  
+`POST /auth/register` : adds a new user with username and password (and returns a JWT)  
+`GET /auth/me` : gets informations about the user associated with the JWT
 
 
  ## Milestones
