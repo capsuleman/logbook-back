@@ -2,7 +2,7 @@ var express = require('express');
 var morgan = require('morgan')
 var cors = require('cors');
 var rfs = require('rotating-file-stream')
-var sqlite3 = require('sqlite3').verbose();
+var AppDAO = require('./dao');
 var config = require('./config');
 
 
@@ -26,32 +26,22 @@ if (config.log.output) {
 app.use(cors());
 
 
-let db = new sqlite3.Database('./db/main.db', sqlite3.OPEN_READWRITE, (err) => {
-    if (err) {
-        console.error(err.message);
-    } else {
-        console.log('Connected to the database.');
-    }
-});
+var dao = new AppDAO('./db/main.db')
 
-db.run(`CREATE TABLE IF NOT EXISTS user (
+dao.run(`CREATE TABLE IF NOT EXISTS user (
         id INT PRIMARY KEY NOT NULL,
         username TEXT,
         password TEXT,
         key TEXT
     )`);
 
-db.run(`CREATE TABLE IF NOT EXISTS message (
+dao.run(`CREATE TABLE IF NOT EXISTS message (
         id INT PRIMARY KEY NOT NULL,
         userid INT,
         message TEXT,
         post DATETIME,
         target DATETIME
     )`);
-
-db.close();
-
-
 
 
 app.get('/', function (req, res) {
