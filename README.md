@@ -7,19 +7,20 @@ The goal of LogBook application is to store daily reports with a web application
 The back is a Node application (Express) and the database connection is made with sqlite3 module.
 
 ## Endpoints
-`POST /newmessage` : adds a new message to a selected date to the connected user  
-`GET /message` : gets message at a specified date from the current user  
-`GET /date` : gets the dates with stored messages  
-`POST /auth/login` : returns a JWT if the pair username/password is correct  
+`POST /message` : adds a new message to a selected date to the connected user  
+`GET /message/date` : gets the dates with stored messages  
+`GET /message/:date` : gets message at a specified date from the current user  
+`DELETE /message/:id` : removes message with id  
 `POST /auth/register` : adds a new user with username and password (and returns a JWT)  
 `GET /auth/me` : gets informations about the user associated with the JWT
+`POST /auth/login` : returns a JWT if the pair username/password is correct  
 
 
  ## Milestones
  `[X]` Specifications and README  
  `[X]` Definition of database scheme  
  `[X]` Authentification of users  
- `[ ]` Messages management  
+ `[X]` Messages management  
  `[ ]` Encrpytion of messages  
 
  ## Database scheme
