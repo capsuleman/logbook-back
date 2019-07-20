@@ -19,7 +19,7 @@ router.post('/', VerifyToken, function (req, res) {
     var isoString = now.toISOString().substring(0, 19);
 
     dao.run('INSERT INTO message (userid, message, post, target) VALUES (?, ?, ?, ?)', [req.userId, req.body.message, isoString, req.body.target])
-        .then(() => { return res.status(200).send('Message stored') })
+        .then(rep => { return res.status(200).json(rep.id) })
         .catch(_ => { return res.status(500).send('Error on the server.') })
 })
 
@@ -34,9 +34,9 @@ router.get('/date', VerifyToken, function (req, res) {
 
 // GET MESSAGE
 router.get('/:date', VerifyToken, function (req, res) {
-    if (!req.params.date.match(/^\d{4}-\d{2}-\d{2}$/)) { return res.status(400).send('Bad format for target date (YYY-MM-DD)') }
+    if (!req.params.date.match(/^\d{4}-\d{2}-\d{2}$/)) { return res.status(400).send('Bad format for target date (YYYY-MM-DD)') }
 
-    dao.all('SELECT rowid, message, post FROM message WHERE userid = ? AND target = ?', [req.userId, req.params.date])
+    dao.all('SELECT rowid, message, post FROM message WHERE userid = ? AND target = ? ORDER BY post', [req.userId, req.params.date])
         .then((ans) => {
             res.status(200).json(ans)
         })
@@ -51,7 +51,7 @@ router.delete('/:id', VerifyToken, function (req, res) {
             return dao.run('DELETE FROM message WHERE rowid = ? AND userid = ?', [req.params.id, req.userId])
         })
         .then(() => {
-            res.status(200).send('Message deleted.');
+            res.status(200).send();
         })
         .catch(err => {
             if (err = 'messageNotFound') return res.status(404).send('Message not found.');

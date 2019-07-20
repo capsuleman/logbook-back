@@ -30,8 +30,10 @@ router.post('/register', function (req, res) {
             var token = jwt.sign(
                 { id: ans.id },
                 config.cred.authsecret,
-                { expiresIn: 86400 }); // expires in 24 hours
-            return res.status(201).send({ auth: true, token: token });
+                { expiresIn: config.cred.delay }
+            );
+            return res.status(201).send({ auth: true, token: token, expiresIn: config.cred.delay });
+
         })
         .catch(err => {
             if (err == 'alreadyRegistered') return res.status(409).send('User is already registered.');
@@ -58,15 +60,18 @@ router.get('/me', VerifyToken, function (req, res) {
 router.post('/login', function (req, res) {
     dao.get('SELECT rowid, * FROM user WHERE username = ?', [req.body.username])
         .then(user => {
+
             if (!user) return res.status(401).send({ auth: false, token: null });
 
             var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
 
-            var token = jwt.sign({ id: user.rowid }, config.cred.authsecret, {
-                expiresIn: 86400 // expires in 24 hours
-            });
-            res.status(200).send({ auth: true, token: token });
+            var token = jwt.sign(
+                { id: user.rowid },
+                config.cred.authsecret,
+                { expiresIn: config.cred.delay }
+            );
+            res.status(200).send({ auth: true, token: token, expiresIn: config.cred.delay });
         })
         .catch(_ => { return res.status(500).send('Error on the server.') })
 });
@@ -76,7 +81,7 @@ router.post('/login', function (req, res) {
 // modify the key from the JWT user
 router.post('/key', VerifyToken, function (req, res) {
     dao.run('UPDATE user SET key = ? WHERE rowid = ?', [req.body.key, req.userId])
-        .then(() => { return res.status(200).send('Key added / changed') })
+        .then(() => { return res.status(200).send() })
         .catch(_ => { return res.status(500).send('Error on the server.') })
 })
 
@@ -85,7 +90,7 @@ router.post('/key', VerifyToken, function (req, res) {
 // delete the key from the JWT user
 router.delete('/key', VerifyToken, function (req, res) {
     dao.run('UPDATE user SET key = ? WHERE rowid = ?', [null, req.userId])
-        .then(() => { return res.status(200).send('Key removed') })
+        .then(() => { return res.status(200).send() })
         .catch(_ => { return res.status(500).send('Error on the server.') })
 })
 
