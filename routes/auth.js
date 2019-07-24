@@ -77,12 +77,38 @@ router.post('/login', function (req, res) {
 });
 
 
+// MODIFY CREDS
+// JWT, username and password are required
+router.post('/modifycreds', VerifyToken, function (req, res) {
+    dao.get('SELECT * FROM user WHERE username = ?', [req.body.username])
+        .then((user) => {
+            if (user) throw 'alreadyUsed';
+            var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+            return dao.run('UPDATE user SET username = ?, password = ? WHERE rowid = ?', [req.body.username, hashedPassword, req.userId])
+        })
+        .then(() => { return res.status(200).send() })
+        .catch(err => {
+            if (err == 'alreadyUsed') return res.status(409).send();
+            return res.status(500).send()
+        })
+})
+
+
+// TEST USERNAME
+// just a username is required
+router.get('/isfree/:username', function (req, res) {
+    dao.get('SELECT * FROM user WHERE username = ?', [req.params.username])
+        .then((user) => { return res.status(200).send(Boolean(user)) })
+        .catch(_ => { return res.status(500).send() })
+})
+
+
 // MODIFY KEY ROUTE
 // modify the key from the JWT user
 router.post('/key', VerifyToken, function (req, res) {
     dao.run('UPDATE user SET key = ? WHERE rowid = ?', [req.body.key, req.userId])
         .then(() => { return res.status(200).send() })
-        .catch(_ => { return res.status(500).send('Error on the server.') })
+        .catch(_ => { return res.status(500).send() })
 })
 
 
@@ -91,7 +117,7 @@ router.post('/key', VerifyToken, function (req, res) {
 router.delete('/key', VerifyToken, function (req, res) {
     dao.run('UPDATE user SET key = ? WHERE rowid = ?', [null, req.userId])
         .then(() => { return res.status(200).send() })
-        .catch(_ => { return res.status(500).send('Error on the server.') })
+        .catch(_ => { return res.status(500).send() })
 })
 
 
