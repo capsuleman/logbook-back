@@ -97,8 +97,8 @@ router.post('/modifycreds', VerifyToken, function (req, res) {
 // TEST USERNAME
 // just a username is required
 router.get('/isfree/:username', function (req, res) {
-    dao.get('SELECT * FROM user WHERE username = ?', [req.params.username])
-        .then((user) => { return res.status(200).send(Boolean(user)) })
+    dao.get('SELECT COUNT(*) as c FROM user WHERE username = ?', [req.params.username])
+        .then((rep) => { return res.status(200).send(String(rep.c)) })
         .catch(_ => { return res.status(500).send() })
 })
 
