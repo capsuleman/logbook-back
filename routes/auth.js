@@ -36,8 +36,8 @@ router.post('/register', function (req, res) {
 
         })
         .catch(err => {
-            if (err == 'alreadyRegistered') return res.status(409).send('User is already registered.');
-            return res.status(500).send('There was a problem registering the user.')
+            if (err == 'alreadyRegistered') return res.status(409).send();
+            return res.status(500).send()
         })
 });
 
@@ -47,10 +47,10 @@ router.post('/register', function (req, res) {
 router.get('/me', VerifyToken, function (req, res) {
     dao.get('SELECT rowid, username, key FROM user WHERE rowid = ?', [req.userId])
         .then(user => {
-            if (!user) return res.status(404).send('No user found.');
+            if (!user) return res.status(404).send();
             return res.status(200).send(user);
         })
-        .catch(_ => { return res.status(500).send('There was a problem finding the user.') });
+        .catch(_ => { return res.status(500).send() });
 });
 
 
@@ -73,7 +73,7 @@ router.post('/login', function (req, res) {
             );
             res.status(200).send({ auth: true, token: token, expiresIn: config.cred.delay });
         })
-        .catch(_ => { return res.status(500).send('Error on the server.') })
+        .catch(_ => { return res.status(500).send() })
 });
 
 
