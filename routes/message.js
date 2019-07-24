@@ -43,21 +43,21 @@ router.get('/:date', VerifyToken, function (req, res) {
 })
 
 
-// REMOVE MESSAGE
-router.delete('/:id', VerifyToken, function (req, res) {
-    dao.get('SELECT COUNT(*) AS nb FROM message WHERE rowid = ? AND userid = ?', [req.params.id, req.userId])
-        .then((ans) => {
-            if (ans.nb == 0) throw 'messageNotFound';
-            return dao.run('DELETE FROM message WHERE rowid = ? AND userid = ?', [req.params.id, req.userId])
-        })
-        .then(() => {
-            res.status(200).send();
-        })
-        .catch(err => {
-            if (err = 'messageNotFound') return res.status(404).send('Message not found.');
-            return res.status(500).send('There was a problem registering the user.');
-        })
-})
+// // REMOVE MESSAGE
+// router.delete('/:id', VerifyToken, function (req, res) {
+//     dao.get('SELECT COUNT(*) AS nb FROM message WHERE rowid = ? AND userid = ?', [req.params.id, req.userId])
+//         .then((ans) => {
+//             if (ans.nb == 0) throw 'messageNotFound';
+//             return dao.run('DELETE FROM message WHERE rowid = ? AND userid = ?', [req.params.id, req.userId])
+//         })
+//         .then(() => {
+//             res.status(200).send();
+//         })
+//         .catch(err => {
+//             if (err = 'messageNotFound') return res.status(404).send('Message not found.');
+//             return res.status(500).send('There was a problem registering the user.');
+//         })
+// })
 
 
 module.exports = router;
