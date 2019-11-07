@@ -21,7 +21,7 @@ The back is a Node application (Express) and the database connection is made wit
  `[X]` Definition of database scheme  
  `[X]` Authentification of users  
  `[X]` Messages management  
- `[ ]` Encrpytion of messages  
+ `[X]` Encrpytion of messages  
 
  ## Database scheme
 Relational database (SQL mith MySQL), because it works on a Raspberry Pi contrary to NoSQL databases...  

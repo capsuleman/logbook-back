@@ -63,3 +63,5 @@ typings/
 
 db
 config.js
+Dockerfile
+.dockerignore
