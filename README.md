@@ -12,7 +12,7 @@ The back is a Node application (Express) and the database connection is made wit
 `GET /message/:date` : gets message at a specified date from the current user  
 `DELETE /message/:id` : removes message with id  
 `POST /auth/register` : adds a new user with username and password (and returns a JWT)  
-`GET /auth/me` : gets informations about the user associated with the JWT
+`GET /auth/me` : gets informations about the user associated with the JWT  
 `POST /auth/login` : returns a JWT if the pair username/password is correct  
 
 
@@ -37,3 +37,31 @@ Relational database (SQL mith MySQL), because it works on a Raspberry Pi contrar
     * Message text
     * Post date
     * Target date
+
+## Example of configuration file
+Configuration file is stored in root of the repository.
+``` js
+var config = {
+    web: {
+        port: 8080
+    },
+    log: {
+        type: 'dev',
+        output: false
+    },
+    cred: {
+        authsecret: 'mdptoutpipo',
+        delay: 86400  // expires in 24 hours
+    },
+    db: {
+        host: 'localhost',
+        user: 'logbook',
+        password: 'strongpassword',
+        database: 'logbook',
+
+    }
+};
+
+
+module.exports = config;
+```
