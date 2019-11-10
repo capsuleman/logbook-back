@@ -5,15 +5,13 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
-var AppDAO = require('../dao')
-var dao = new AppDAO('./db/main.db')
-
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 var VerifyToken = require('../VerifyToken');
 
 var config = require('../config');
 
+var dao = require('../dao')
 
 
 // REGISTER NEW USER
@@ -26,9 +24,12 @@ router.post('/register', function (req, res) {
             var hashedPassword = bcrypt.hashSync(req.body.password, 8);
             return dao.run('INSERT INTO user (username, password) VALUES (?, ?)', [req.body.username, hashedPassword]);
         })
-        .then(ans => {
+        .then(() => {
+            return dao.get('SELECT * FROM user WHERE username = ?', [req.body.username]);
+        })
+        .then(user => {
             var token = jwt.sign(
-                { id: ans.id },
+                { id: user.rowid },
                 config.cred.authsecret,
                 { expiresIn: config.cred.delay }
             );
@@ -36,6 +37,7 @@ router.post('/register', function (req, res) {
 
         })
         .catch(err => {
+            console.log(err);
             if (err == 'alreadyRegistered') return res.status(409).send();
             return res.status(500).send()
         })
@@ -45,8 +47,9 @@ router.post('/register', function (req, res) {
 // ACCESS TO USER INFORMATION
 // Only the connected user can access to it.
 router.get('/me', VerifyToken, function (req, res) {
-    dao.get('SELECT rowid, username, key FROM user WHERE rowid = ?', [req.userId])
+    dao.get('SELECT rowid, username, pubkey FROM user WHERE rowid = ?', [req.userId])
         .then(user => {
+
             if (!user) return res.status(404).send();
             return res.status(200).send(user);
         })
@@ -58,7 +61,7 @@ router.get('/me', VerifyToken, function (req, res) {
 // username and password are required.
 // Returns a JWT.
 router.post('/login', function (req, res) {
-    dao.get('SELECT rowid, * FROM user WHERE username = ?', [req.body.username])
+    dao.get('SELECT * FROM user WHERE username = ?', [req.body.username])
         .then(user => {
 
             if (!user) return res.status(401).send({ auth: false, token: null });
@@ -82,6 +85,7 @@ router.post('/login', function (req, res) {
 router.post('/modifycreds', VerifyToken, function (req, res) {
     dao.get('SELECT * FROM user WHERE username = ?', [req.body.username])
         .then((user) => {
+
             if (user) throw 'alreadyUsed';
             var hashedPassword = bcrypt.hashSync(req.body.password, 8);
             return dao.run('UPDATE user SET username = ?, password = ? WHERE rowid = ?', [req.body.username, hashedPassword, req.userId])
@@ -106,7 +110,7 @@ router.get('/isfree/:username', function (req, res) {
 // MODIFY KEY ROUTE
 // modify the key from the JWT user
 router.post('/key', VerifyToken, function (req, res) {
-    dao.run('UPDATE user SET key = ? WHERE rowid = ?', [req.body.key, req.userId])
+    dao.run('UPDATE user SET pubkey = ? WHERE rowid = ?', [req.body.key, req.userId])
         .then(() => { return res.status(200).send() })
         .catch(_ => { return res.status(500).send() })
 })
@@ -115,7 +119,7 @@ router.post('/key', VerifyToken, function (req, res) {
 // REMOVE KEY ROUTE
 // delete the key from the JWT user
 router.delete('/key', VerifyToken, function (req, res) {
-    dao.run('UPDATE user SET key = ? WHERE rowid = ?', [null, req.userId])
+    dao.run('UPDATE user SET pubkey = ? WHERE rowid = ?', [null, req.userId])
         .then(() => { return res.status(200).send() })
         .catch(_ => { return res.status(500).send() })
 })

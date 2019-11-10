@@ -1,13 +1,14 @@
-// From Adam McQuistan, https://stackabuse.com/a-sqlite-tutorial-with-node-js/
-
-const sqlite3 = require('sqlite3').verbose()
+const mysql = require('mysql')
 const Promise = require('bluebird')
 
 class AppDAO {
-    constructor(dbFilePath) {
-        this.db = new sqlite3.Database(dbFilePath, (err) => {
+    constructor(params) {
+
+        this.db = mysql.createConnection(params)
+
+        this.db.connect((err) => {
             if (err) {
-                console.log('Could not connect to database', err)
+                console.error('Could not connect to database', err)
             } else {
                 console.log('Connected to database')
             }
@@ -16,10 +17,10 @@ class AppDAO {
 
     run(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function (err) {
+            this.db.query(sql, params, function (err) {
                 if (err) {
-                    console.log('Error running sql ' + sql)
-                    console.log(err)
+                    console.error('Error running sql ' + sql)
+                    console.error(err)
                     reject(err)
                 } else {
                     resolve({ id: this.lastID })
@@ -30,13 +31,15 @@ class AppDAO {
 
     get(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.get(sql, params, (err, result) => {
+            this.db.query(sql, params, function (err, result) {
                 if (err) {
-                    console.log('Error running sql: ' + sql)
-                    console.log(err)
+                    console.error('Error running sql: ' + sql)
+                    console.error(err)
                     reject(err)
+                } else if (result) {
+                    resolve(result[0])
                 } else {
-                    resolve(result)
+                    resolve(undefined)
                 }
             })
         })
@@ -44,10 +47,10 @@ class AppDAO {
 
     all(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (err, rows) => {
+            this.db.query(sql, params, (err, rows) => {
                 if (err) {
-                    console.log('Error running sql: ' + sql)
-                    console.log(err)
+                    console.error('Error running sql: ' + sql)
+                    console.error(err)
                     reject(err)
                 } else {
                     resolve(rows)
@@ -57,4 +60,11 @@ class AppDAO {
     }
 }
 
-module.exports = AppDAO  
+// Database access with DAO
+var config = require('./config');
+var dao = new AppDAO(config.db)
+
+dao.run('CREATE TABLE IF NOT EXISTS user (rowid INT PRIMARY KEY NOT NULL AUTO_INCREMENT, username TEXT, password TEXT, pubkey TEXT);');
+dao.run('CREATE TABLE IF NOT EXISTS message (rowid INT PRIMARY KEY NOT NULL AUTO_INCREMENT, userid INT, target DATE, message TEXT, post DATETIME);');
+
+module.exports = dao;

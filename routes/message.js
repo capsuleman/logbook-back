@@ -5,10 +5,9 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
-var AppDAO = require('../dao')
-var dao = new AppDAO('./db/main.db')
-
 var VerifyToken = require('../VerifyToken');
+
+var dao = require('../dao')
 
 
 // ADD MESSAGE
